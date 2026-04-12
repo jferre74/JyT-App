@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="JyT App – Der digitale Familienplaner für Kalender, Listen und Reisekosten." />
+  <meta name="theme-color" content="#1a1a2e" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- iOS / Safari PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="JyT" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png" />
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-128.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png" />
+
+  <title>JyT App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header id="app-header">
+      <div class="header-left">
+        <span id="header-title">Kalender</span>
+      </div>
+      <div class="header-right" id="header-actions"></div>
+    </header>
+
+    <!-- Page Container -->
+    <main id="page-container">
+      <!-- Pages are injected here by JS -->
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav">
+      <button class="nav-item active" data-page="calendar" id="nav-calendar">
+        <i class="ph-duotone ph-calendar-blank"></i>
+        <span>Kalender</span>
+      </button>
+      <button class="nav-item" data-page="notes" id="nav-notes">
+        <i class="ph-duotone ph-notebook"></i>
+        <span>Notizen</span>
+      </button>
+      <button class="nav-item" data-page="expenses" id="nav-expenses">
+        <i class="ph-duotone ph-wallet"></i>
+        <span>Ausgaben</span>
+      </button>
+      <button class="nav-item" data-page="settings" id="nav-settings">
+        <i class="ph-duotone ph-gear"></i>
+        <span>Einstellungen</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- =================== MODALS =================== -->
+
+  <!-- Event Modal -->
+  <div class="modal-overlay hidden" id="event-modal-overlay">
+    <div class="modal" id="event-modal">
+      <div class="modal-header">
+        <h2 id="event-modal-title">Neuer Termin</h2>
+        <button class="modal-close" id="event-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="ev-title">Titel</label>
+          <input type="text" id="ev-title" placeholder="Termintitel" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ev-start">Beginn</label>
+            <input type="datetime-local" id="ev-start" />
+          </div>
+          <div class="form-group">
+            <label for="ev-end">Ende</label>
+            <input type="datetime-local" id="ev-end" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="ev-member">Person</label>
+          <select id="ev-member"></select>
+        </div>
+        <div class="form-group">
+          <label for="ev-recurrence">Wiederholung</label>
+          <select id="ev-recurrence">
+            <option value="none">Keine</option>
+            <option value="daily">Täglich</option>
+            <option value="weekly">Wöchentlich</option>
+            <option value="monthly">Monatlich</option>
+            <option value="annually">Jährlich</option>
+          </select>
+        </div>
+        <div class="form-group hidden" id="ev-scope-group">
+          <label>Bearbeiten</label>
+          <div class="radio-group">
+            <label><input type="radio" name="ev-scope" value="this" checked /> Nur dieser Termin</label>
+            <label><input type="radio" name="ev-scope" value="future" /> Dieser und folgende</label>
+            <label><input type="radio" name="ev-scope" value="all" /> Alle</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger hidden" id="ev-delete-btn">Löschen</button>
+        <div class="modal-footer-right">
+          <button class="btn btn-ghost" id="ev-cancel-btn">Abbrechen</button>
+          <button class="btn btn-primary" id="ev-save-btn">Speichern</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day Summary Modal -->
+  <div class="modal-overlay hidden" id="day-summary-modal-overlay">
+    <div class="modal modal-sm" id="day-summary-modal">
+      <div class="modal-header">
+        <h2 id="day-summary-title">Tag Details</h2>
+        <button class="modal-close" id="day-summary-close">&times;</button>
+      </div>
+      <div class="modal-body" id="day-summary-body" style="padding: 0; max-height: 50vh; overflow-y: auto;">
+        <!-- Day summary content injected here -->
+      </div>
+      <div class="modal-footer" style="justify-content: center;">
+        <button class="btn btn-primary" id="day-summary-add-btn">
+          <i class="ph-bold ph-plus"></i> Neuer Termin
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- List Modal -->
+  <div class="modal-overlay hidden" id="list-modal-overlay">
+    <div class="modal modal-sm" id="list-modal">
+      <div class="modal-header">
+        <h2 id="list-modal-title">Neue Liste</h2>
+        <button class="modal-close" id="list-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="lst-name">Listenname</label>
+          <input type="text" id="lst-name" placeholder="z.B. Einkauf, Packliste..." />
+        </div>
+        <div class="form-group">
+          <label for="lst-icon">Symbol</label>
+          <select id="lst-icon">
+            <option value="🛒">🛒 Einkauf</option>
+            <option value="🧳">🧳 Reise</option>
+            <option value="✅">✅ To-Do</option>
+            <option value="🎉">🎉 Party</option>
+            <option value="📦">📦 Sonstiges</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger hidden" id="lst-delete-btn">Liste löschen</button>
+        <div class="modal-footer-right">
+          <button class="btn btn-ghost" id="lst-cancel-btn">Abbrechen</button>
+          <button class="btn btn-primary" id="lst-save-btn">Speichern</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- List Item Context Menu -->
+  <div class="context-menu hidden" id="item-context-menu">
+    <button class="ctx-item" id="ctx-to-subtitle">↕ Als Abschnittstitel</button>
+    <button class="ctx-item" id="ctx-to-item">📝 Als normalen Eintrag</button>
+    <button class="ctx-item danger" id="ctx-delete-item">🗑 Löschen</button>
+  </div>
+
+  <!-- Trip Modal -->
+  <div class="modal-overlay hidden" id="trip-modal-overlay">
+    <div class="modal modal-sm" id="trip-modal">
+      <div class="modal-header">
+        <h2 id="trip-modal-title">Neue Reise</h2>
+        <button class="modal-close" id="trip-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="trip-name">Name der Reise</label>
+          <input type="text" id="trip-name" placeholder="z.B. Sommerurlaub 2026" />
+        </div>
+        <div class="form-group">
+          <label>Teilnehmer</label>
+          <div id="trip-participants-check" class="checkbox-group"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger hidden" id="trip-delete-btn">Reise löschen</button>
+        <div class="modal-footer-right">
+          <button class="btn btn-ghost" id="trip-cancel-btn">Abbrechen</button>
+          <button class="btn btn-primary" id="trip-save-btn">Speichern</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expense Modal -->
+  <div class="modal-overlay hidden" id="expense-modal-overlay">
+    <div class="modal" id="expense-modal">
+      <div class="modal-header">
+        <h2 id="expense-modal-title">Neue Ausgabe</h2>
+        <button class="modal-close" id="expense-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="exp-desc">Beschreibung</label>
+            <input type="text" id="exp-desc" placeholder="z.B. Hotel, Restaurant..." />
+          </div>
+          <div class="form-group">
+            <label for="exp-category">Kategorie</label>
+            <select id="exp-category">
+              <option value="accommodation">🛏️ Unterkunft</option>
+              <option value="food">🍽️ Essen & Trinken</option>
+              <option value="transport">🚗 Transport</option>
+              <option value="activities">🎫 Aktivitäten</option>
+              <option value="other">📦 Sonstiges</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="exp-amount">Betrag</label>
+            <input type="number" id="exp-amount" placeholder="0.00" step="0.01" min="0" />
+          </div>
+          <div class="form-group">
+            <label for="exp-currency">Währung</label>
+            <select id="exp-currency"></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="exp-payer">Bezahlt von</label>
+            <select id="exp-payer"></select>
+          </div>
+          <div class="form-group">
+            <label for="exp-payment-method">Zahlungsart</label>
+            <select id="exp-payment-method">
+              <option value="card">💳 Karte</option>
+              <option value="cash">💶 Bargeld</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="exp-date">Datum</label>
+            <input type="date" id="exp-date" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Teilnehmer</label>
+          <div id="exp-participants-check" class="checkbox-group"></div>
+        </div>
+        <div class="form-group">
+          <label for="exp-split">Aufteilung</label>
+          <select id="exp-split">
+            <option value="even">Gleichmäßig</option>
+            <option value="percentage">Prozentual</option>
+            <option value="fixed">Fester Betrag</option>
+            <option value="individual">Individuell</option>
+          </select>
+        </div>
+        <div id="exp-split-details" class="split-details hidden"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger hidden" id="exp-delete-btn">Löschen</button>
+        <div class="modal-footer-right">
+          <button class="btn btn-ghost" id="exp-cancel-btn">Abbrechen</button>
+          <button class="btn btn-primary" id="exp-save-btn">Speichern</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Modal -->
+  <div class="modal-overlay hidden" id="member-modal-overlay">
+    <div class="modal modal-sm" id="member-modal">
+      <div class="modal-header">
+        <h2 id="member-modal-title">Familienmitglied</h2>
+        <button class="modal-close" id="member-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="mem-name">Name</label>
+          <input type="text" id="mem-name" placeholder="z.B. Thomas, Javier, Martin..." />
+        </div>
+        <div class="form-group">
+          <label for="mem-color">Farbe</label>
+          <div id="color-picker" class="color-picker"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger hidden" id="mem-delete-btn">Entfernen</button>
+        <div class="modal-footer-right">
+          <button class="btn btn-ghost" id="mem-cancel-btn">Abbrechen</button>
+          <button class="btn btn-primary" id="mem-save-btn">Speichern</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/state.js"></script>
+  <script src="js/holidays.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/Notes.js"></script>
+  <script src="js/expenses.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/sync.js"></script>
+  <script src="js/main.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('./sw.js')
+          .then((reg) => {
+            console.log('[PWA] Service Worker registered, scope:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('[PWA] Service Worker registration failed:', err);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

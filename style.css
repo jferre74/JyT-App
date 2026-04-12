@@ -89,6 +89,7 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
   /* Layout */
   --header-h: 60px;
   --nav-h: 72px;
+  --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
@@ -127,11 +128,12 @@ body[data-theme='light'] {
 
 /* ── Header ───────────────────────────────────────── */
 #app-header {
-  height: var(--header-h);
+  height: calc(var(--header-h) + var(--safe-top));
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  padding: 0 var(--space-md);
+  padding: 0 var(--space-md) 0;
+  padding-top: var(--safe-top);
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
@@ -590,7 +592,7 @@ body[data-theme='light'] {
 }
 .ys-container {
   overflow: auto;
-  max-height: calc(100vh - var(--header-h) - var(--nav-h) - 60px); 
+  max-height: calc(100dvh - var(--header-h) - var(--safe-top) - var(--nav-h) - 60px); 
   background: var(--border);
   position: relative;
   /* Expose zoom variable to children */

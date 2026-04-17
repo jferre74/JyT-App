@@ -673,22 +673,6 @@ function attachCalendarEvents() {
       openDayListSheet(dateStr);
     });
   });
-        
-        // Attach event listeners inside the modal
-        dlBody.querySelectorAll('.event-list-item').forEach(item => {
-          item.addEventListener('click', () => {
-            const evId = item.dataset.evid;
-            dlModal.classList.add('hidden'); // Close day list
-            openEventModal(evId); // Open edit modal
-          });
-        });
-        
-        document.getElementById('day-list-close').onclick = () => {
-          dlModal.classList.add('hidden');
-        };
-      }
-    });
-  });
 
   page.querySelectorAll('.ys-event').forEach(ev => {
     ev.addEventListener('click', (e) => {

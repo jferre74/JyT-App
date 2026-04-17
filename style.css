@@ -1789,3 +1789,80 @@ input[type="radio"], input[type="checkbox"] { appearance: auto; -webkit-appearan
   opacity: 0.85;
 }
 
+/* ====================================================
+   DAY-LIST BOTTOM SHEET  (Planer view)
+   ==================================================== */
+#day-list-sheet {
+  display: none;
+}
+#day-list-sheet.dls-open {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+#day-list-sheet.dls-hidden {
+  display: none;
+}
+
+/* Semi-transparent backdrop */
+#day-list-sheet .dls-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* Sliding panel — anchored to bottom */
+#day-list-sheet .dls-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  /* Cap height so the close button is never off screen */
+  max-height: 60svh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Header with date label + close button */
+#day-list-sheet .dls-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+#day-list-sheet .dls-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+#day-list-sheet .dls-close {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--bg-elevated);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+  transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+#day-list-sheet .dls-close:hover { background: var(--accent); color: #fff; }
+
+/* Scrollable event list */
+#day-list-sheet .dls-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  flex: 1;
+}
+

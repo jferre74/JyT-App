@@ -1,6 +1,6 @@
 // JyT App - Service Worker
 // Cache version: bump this to force cache refresh after updates
-const CACHE_NAME = 'jyt-app-v2';
+const CACHE_NAME = 'jyt-app-v3';
 
 // All assets to cache on install (app shell)
 const PRECACHE_ASSETS = [

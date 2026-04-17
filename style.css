@@ -118,7 +118,9 @@ body[data-theme='light'] {
 #app {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  /* Use svh (small viewport height) so the app shell shrinks when the
+     iOS keyboard appears and never overflows behind it. */
+  height: 100svh;
   max-width: 480px;
   margin: 0 auto;
   position: relative;
@@ -592,7 +594,7 @@ body[data-theme='light'] {
 }
 .ys-container {
   overflow: auto;
-  max-height: calc(100dvh - var(--header-h) - var(--safe-top) - var(--nav-h) - 60px); 
+  max-height: calc(100svh - var(--header-h) - var(--nav-h) - 60px); 
   background: var(--border);
   position: relative;
   /* Expose zoom variable to children */
@@ -793,7 +795,7 @@ body[data-theme='dark'] .ys-cell.sunday { background: #2e1212; color: #f98080; }
   color: var(--text-muted);
   padding: var(--space-xl);
   text-align: center;
-  min-height: 60dvh;
+  min-height: 60svh;
 }
 .notes-empty-icon { font-size: 64px; line-height: 1; }
 .no-notes h3 { color: var(--text-secondary); font-size: 18px; }

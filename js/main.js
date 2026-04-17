@@ -159,5 +159,31 @@ function initApp() {
   }
 }
 
+// ── iOS Keyboard / VisualViewport Fix ─────────────────
+// When the soft keyboard opens on iOS, the visual viewport shrinks but
+// the layout viewport does not — causing content to be hidden behind the
+// keyboard. We listen to visualViewport resize events and manually adjust
+// the #app height so the bottom nav and content stay visible.
+(function initKeyboardFix() {
+  const vv = window.visualViewport;
+  if (!vv) return; // Not supported (desktop / older browsers)
+
+  const app = () => document.getElementById('app');
+
+  function onViewportChange() {
+    const el = app();
+    if (!el) return;
+    // Set the app height to the actual visible viewport height.
+    // This shrinks the shell when the keyboard is open and restores it when closed.
+    el.style.height = vv.height + 'px';
+  }
+
+  vv.addEventListener('resize', onViewportChange);
+  vv.addEventListener('scroll', onViewportChange);
+
+  // Also reset on DOMContentLoaded in case there's already an offset
+  document.addEventListener('DOMContentLoaded', onViewportChange);
+})();
+
 // ── Start ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', initApp);

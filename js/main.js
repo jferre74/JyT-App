@@ -157,33 +157,37 @@ function initApp() {
   if (window.initSync) {
     window.initSync();
   }
+
+  // iOS keyboard / visual-viewport handler (must run after #app is in DOM)
+  initKeyboardFix();
 }
 
 // ── iOS Keyboard / VisualViewport Fix ─────────────────
-// When the soft keyboard opens on iOS, the visual viewport shrinks but
-// the layout viewport does not — causing content to be hidden behind the
-// keyboard. We listen to visualViewport resize events and manually adjust
-// the #app height so the bottom nav and content stay visible.
-(function initKeyboardFix() {
+// Sets --vvh on <html> and forces #app height to the visible viewport height
+// so the shell shrinks correctly when the iOS soft keyboard opens.
+function initKeyboardFix() {
   const vv = window.visualViewport;
-  if (!vv) return; // Not supported (desktop / older browsers)
 
-  const app = () => document.getElementById('app');
-
-  function onViewportChange() {
-    const el = app();
-    if (!el) return;
-    // Set the app height to the actual visible viewport height.
-    // This shrinks the shell when the keyboard is open and restores it when closed.
-    el.style.height = vv.height + 'px';
+  function applyVVH() {
+    const h = vv ? Math.round(vv.height) : window.innerHeight;
+    document.documentElement.style.setProperty('--vvh', h + 'px');
+    const app = document.getElementById('app');
+    if (app) app.style.height = h + 'px';
   }
 
-  vv.addEventListener('resize', onViewportChange);
-  vv.addEventListener('scroll', onViewportChange);
+  if (vv) {
+    vv.addEventListener('resize', applyVVH);
+    vv.addEventListener('scroll', applyVVH);
+  }
 
-  // Also reset on DOMContentLoaded in case there's already an offset
-  document.addEventListener('DOMContentLoaded', onViewportChange);
-})();
+  // Run once on init and after layout settles
+  applyVVH();
+  setTimeout(applyVVH, 100);
+
+  // Re-apply when keyboard appears / disappears (focusin = keyboard opens)
+  document.addEventListener('focusin',  () => setTimeout(applyVVH, 350));
+  document.addEventListener('focusout', () => setTimeout(applyVVH, 350));
+}
 
 // ── Start ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', initApp);

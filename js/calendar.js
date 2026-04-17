@@ -496,19 +496,72 @@ function renderYearSummaryView() {
   }
 
   html += `</div></div>`;
-  
-  // Modals for Planer
-  html += `
-  <div id="day-list-modal" class="modal-overlay hidden">
-    <div class="modal-content" style="max-width: 400px; padding: 0;">
-      <div id="day-list-modal-body"></div>
-      <div class="modal-actions" style="padding: var(--space-md);">
-        <button class="btn btn-secondary w-100" id="day-list-close">Schließen</button>
-      </div>
-    </div>
-  </div>`;
 
   return html;
+}
+
+// ── Day-List Bottom Sheet (Planer) ────────────────────
+// Creates a fixed-position bottom sheet in <body> so the close
+// button is always visible no matter how far the user has scrolled.
+function openDayListSheet(dateStr) {
+  let sheet = document.getElementById('day-list-sheet');
+  if (!sheet) {
+    sheet = document.createElement('div');
+    sheet.id = 'day-list-sheet';
+    document.body.appendChild(sheet);
+  }
+
+  const events = getEventsForDay(dateStr);
+  const d = parseLocalDate(dateStr);
+  const label = formatDate(d, { weekday: 'long', day: 'numeric', month: 'long' });
+
+  let evHtml = '';
+  if (events.length === 0) {
+    evHtml = `<p style="padding:12px 0;color:var(--text-muted)">Keine Termine an diesem Tag</p>`;
+  }
+  for (const ev of events) {
+    const color = getMemberColor(ev.memberId);
+    const name  = getMemberName(ev.memberId);
+    const multiLabel = ev._isMultiDay
+      ? `<span style="font-size:10px;opacity:0.7;margin-left:4px">(Tag ${ev._dayIndex+1}/${ev._totalDays})</span>`
+      : '';
+    const timeStr = ev._isMultiDay
+      ? `${ev._origStart.slice(0,10)} - ${ev._origEnd.slice(0,10)}`
+      : `${formatTime(ev.start)} - ${formatTime(ev.end)}`;
+    evHtml += `<div class="event-list-item dls-ev-item" data-evid="${ev.id}">
+      <div class="ev-color-bar" style="background:${color}"></div>
+      <div class="ev-list-info">
+        <div class="ev-list-title">${ev.title}${multiLabel}</div>
+        <div class="ev-list-time">${timeStr}</div>
+        <div class="ev-list-member">${name}</div>
+      </div>
+    </div>`;
+  }
+
+  sheet.innerHTML = `
+    <div class="dls-backdrop"></div>
+    <div class="dls-panel">
+      <div class="dls-header">
+        <span class="dls-title">${label}</span>
+        <button class="dls-close" id="dls-close-btn" aria-label="Schliessen">
+          <i class="ph-bold ph-x" style="font-size:18px"></i>
+        </button>
+      </div>
+      <div class="dls-body">${evHtml}</div>
+    </div>`;
+
+  sheet.className = 'dls-open';
+
+  const close = () => { sheet.className = 'dls-hidden'; };
+  sheet.querySelector('.dls-backdrop').addEventListener('click', close);
+  sheet.querySelector('#dls-close-btn').addEventListener('click', close);
+
+  sheet.querySelectorAll('.dls-ev-item').forEach(item => {
+    item.addEventListener('click', () => {
+      close();
+      openEventModal(item.dataset.evid);
+    });
+  });
 }
 
 
@@ -608,21 +661,18 @@ function attachCalendarEvents() {
   // Year Summary cell clicks
   page.querySelectorAll('.ys-cell:not(.empty)').forEach(cell => {
     cell.addEventListener('click', (e) => {
-      // If click was on an event, ignore (let event-pill handler catch it)
       if (e.target.closest('.ys-event')) return;
       const dateStr = cell.dataset.date;
       STATE.ui.selectedDay = dateStr;
-      
-      // Select the day visually
+
+      // Highlight selected cell
       page.querySelectorAll('.ys-cell.selected').forEach(c => c.classList.remove('selected'));
       cell.classList.add('selected');
-      
-      // Open the list of events for that day
-      const dlModal = document.getElementById('day-list-modal');
-      const dlBody = document.getElementById('day-list-modal-body');
-      if (dlModal && dlBody) {
-        dlBody.innerHTML = renderDayEventList(dateStr, getEventsForDay(dateStr));
-        dlModal.classList.remove('hidden');
+
+      // Open fixed bottom sheet with the day's events
+      openDayListSheet(dateStr);
+    });
+  });
         
         // Attach event listeners inside the modal
         dlBody.querySelectorAll('.event-list-item').forEach(item => {

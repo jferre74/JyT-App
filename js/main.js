@@ -190,4 +190,6 @@ function initKeyboardFix() {
 }
 
 // ── Start ─────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', initApp);
+document.addEventListener('DOMContentLoaded', () => {
+  requireAuth().then(initApp);
+});

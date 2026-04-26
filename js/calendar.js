@@ -97,6 +97,8 @@ function renderCalendarHeader() {
   const monthLabel = `${MONTH_NAMES[calDate.getMonth()]} ${calDate.getFullYear()}`;
 
   document.getElementById('header-title').textContent = monthLabel;
+  // Calendar is a top-level page — no back button
+  document.getElementById('header-back').innerHTML = '';
   const ha = document.getElementById('header-actions');
   ha.innerHTML = `
     ${switcher}

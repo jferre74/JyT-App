@@ -6,6 +6,7 @@
 function renderSettingsPage() {
   document.getElementById('header-title').textContent = 'Einstellungen';
   document.getElementById('header-actions').innerHTML = '';
+  document.getElementById('header-back').innerHTML = '';
 
   const page = document.getElementById('settings-page');
   const bl = STATE.settings.bundesland || '';

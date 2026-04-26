@@ -22,6 +22,7 @@ function renderExpensesPage() {
 function renderExpensesList(page) {
   document.getElementById('header-title').textContent = 'Ausgaben';
   document.getElementById('header-actions').innerHTML = '';
+  document.getElementById('header-back').innerHTML = '';
 
   const allTrips = STATE.trips || [];
   const trips = allTrips.filter(t => !t.archived);
@@ -105,11 +106,14 @@ function renderExpensesList(page) {
 
 function renderExpensesArchive(page) {
   document.getElementById('header-title').textContent = 'Archiv';
-  document.getElementById('header-actions').innerHTML = `
-    <button class="header-btn" id="archive-back-btn" title="Zurück">
-      <i class="ph-bold ph-caret-left" style="font-size: 20px;"></i>
+  // iOS: back button goes top-left
+  document.getElementById('header-back').innerHTML = `
+    <button class="ios-back-btn" id="archive-back-btn" title="Zurück">
+      <i class="ph-bold ph-caret-left"></i>
+      <span>Ausgaben</span>
     </button>
   `;
+  document.getElementById('header-actions').innerHTML = '';
 
   document.getElementById('archive-back-btn').addEventListener('click', () => {
     STATE.ui.expensesView = 'list';
@@ -190,12 +194,15 @@ function renderExpensesDetail(page) {
 
   document.getElementById('header-title').textContent = trip.name;
 
-  // Build header actions depending on archive state
+  // iOS: back button top-left, action buttons top-right
+  document.getElementById('header-back').innerHTML = `
+    <button class="ios-back-btn" id="exp-back-btn" title="Zurück">
+      <i class="ph-bold ph-caret-left"></i>
+      <span>Zurück</span>
+    </button>
+  `;
   if (isArchived) {
     document.getElementById('header-actions').innerHTML = `
-      <button class="header-btn" id="exp-back-btn" title="Zurück">
-        <i class="ph-bold ph-caret-left" style="font-size: 20px;"></i>
-      </button>
       <span class="archived-badge">🗄 Archiviert</span>
       <button class="header-btn" id="exp-unarchive-btn" title="Wiederherstellen" style="color:var(--warning);">
         <i class="ph-bold ph-arrow-counter-clockwise" style="font-size: 20px;"></i>
@@ -204,9 +211,6 @@ function renderExpensesDetail(page) {
     document.getElementById('exp-unarchive-btn').addEventListener('click', () => unarchiveTrip(trip.id));
   } else {
     document.getElementById('header-actions').innerHTML = `
-      <button class="header-btn" id="exp-back-btn" title="Zurück">
-        <i class="ph-bold ph-caret-left" style="font-size: 20px;"></i>
-      </button>
       <button class="header-btn" id="exp-archive-btn" title="Reise archivieren" style="color:var(--text-secondary);">
         <i class="ph-bold ph-archive" style="font-size: 20px;"></i>
       </button>
@@ -777,7 +781,10 @@ function deleteExpense() {
 function initExpenseModal() {
   document.getElementById('expense-modal-close').addEventListener('click', closeExpenseModal);
   document.getElementById('exp-cancel-btn').addEventListener('click', closeExpenseModal);
-  document.getElementById('exp-save-btn').addEventListener('click', saveExpense);
+  // iOS: "Sichern" button is now in the modal header
+  document.getElementById('exp-save-btn-header')?.addEventListener('click', saveExpense);
+  // Legacy footer save button (hidden in iOS layout, kept for safety)
+  document.getElementById('exp-save-btn')?.addEventListener('click', saveExpense);
   document.getElementById('exp-delete-btn').addEventListener('click', deleteExpense);
   document.getElementById('expense-modal-overlay').addEventListener('click', (e) => {
     if (e.target === document.getElementById('expense-modal-overlay')) closeExpenseModal();

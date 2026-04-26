@@ -22,6 +22,7 @@ function renderNotesPage() {
 function renderNotesList() {
   document.getElementById('header-title').textContent = 'Notizen';
   document.getElementById('header-actions').innerHTML = '';
+  document.getElementById('header-back').innerHTML = '';
 
   const page = document.getElementById('notes-page');
   const notes = STATE.notes || [];
@@ -126,17 +127,18 @@ function renderNoteEditor(noteId) {
   const note = (STATE.notes || []).find(n => n.id === noteId);
   if (!note) { notesView = 'list'; renderNotesList(); return; }
 
-  // Header: back + delete
-  document.getElementById('header-title').textContent = '';
-  document.getElementById('header-actions').innerHTML = `
-    <button class="header-btn" id="notes-back-btn" title="Zurück">
-      <i class="ph-bold ph-caret-left" style="font-size: 20px;"></i>
+  // iOS: back button top-left, delete top-right
+  document.getElementById('header-back').innerHTML = `
+    <button class="ios-back-btn" id="notes-back-btn" title="Zurück">
+      <i class="ph-bold ph-caret-left"></i>
+      <span>Notizen</span>
     </button>
+  `;
+  document.getElementById('header-actions').innerHTML = `
     <button class="header-btn" id="notes-delete-btn" title="Notiz löschen" style="color:var(--danger)">
       <i class="ph-bold ph-trash" style="font-size: 20px;"></i>
     </button>
   `;
-
   removeFAB();
 
   const page = document.getElementById('notes-page');

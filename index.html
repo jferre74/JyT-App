@@ -12,7 +12,7 @@
 
   <!-- iOS / Safari PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="JyT" />
   <link rel="apple-touch-icon" href="icons/icon-180.png" />
   <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png" />
@@ -24,9 +24,6 @@
   <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png" />
 
   <title>JyT App</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -34,9 +31,8 @@
   <div id="app">
     <!-- Header -->
     <header id="app-header">
-      <div class="header-left">
-        <span id="header-title">Kalender</span>
-      </div>
+      <div class="header-left" id="header-back"></div>
+      <span id="header-title">Kalender</span>
       <div class="header-right" id="header-actions"></div>
     </header>
 
@@ -71,9 +67,11 @@
   <!-- Event Modal -->
   <div class="modal-overlay hidden" id="event-modal-overlay">
     <div class="modal" id="event-modal">
+      <div class="sheet-handle"></div>
       <div class="modal-header">
+        <button class="ios-text-btn ios-text-btn--cancel" id="event-modal-close">Abbrechen</button>
         <h2 id="event-modal-title">Neuer Termin</h2>
-        <button class="modal-close" id="event-modal-close">&times;</button>
+        <button class="ios-text-btn ios-text-btn--done" id="ev-save-btn">Sichern</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -117,7 +115,6 @@
         <button class="btn btn-danger hidden" id="ev-delete-btn">Löschen</button>
         <div class="modal-footer-right">
           <button class="btn btn-ghost" id="ev-cancel-btn">Abbrechen</button>
-          <button class="btn btn-primary" id="ev-save-btn">Speichern</button>
         </div>
       </div>
     </div>
@@ -126,9 +123,10 @@
   <!-- Day Summary Modal -->
   <div class="modal-overlay hidden" id="day-summary-modal-overlay">
     <div class="modal modal-sm" id="day-summary-modal">
+      <div class="sheet-handle"></div>
       <div class="modal-header">
         <h2 id="day-summary-title">Tag Details</h2>
-        <button class="modal-close" id="day-summary-close">&times;</button>
+        <button class="ios-text-btn ios-text-btn--cancel" id="day-summary-close">Schließen</button>
       </div>
       <div class="modal-body" id="day-summary-body" style="padding: 0; max-height: 50vh; overflow-y: auto;">
         <!-- Day summary content injected here -->
@@ -144,9 +142,11 @@
   <!-- List Modal -->
   <div class="modal-overlay hidden" id="list-modal-overlay">
     <div class="modal modal-sm" id="list-modal">
+      <div class="sheet-handle"></div>
       <div class="modal-header">
+        <button class="ios-text-btn ios-text-btn--cancel" id="list-modal-close">Abbrechen</button>
         <h2 id="list-modal-title">Neue Liste</h2>
-        <button class="modal-close" id="list-modal-close">&times;</button>
+        <button class="ios-text-btn ios-text-btn--done" id="lst-save-btn">Sichern</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -168,7 +168,6 @@
         <button class="btn btn-danger hidden" id="lst-delete-btn">Liste löschen</button>
         <div class="modal-footer-right">
           <button class="btn btn-ghost" id="lst-cancel-btn">Abbrechen</button>
-          <button class="btn btn-primary" id="lst-save-btn">Speichern</button>
         </div>
       </div>
     </div>
@@ -184,9 +183,11 @@
   <!-- Trip Modal -->
   <div class="modal-overlay hidden" id="trip-modal-overlay">
     <div class="modal modal-sm" id="trip-modal">
+      <div class="sheet-handle"></div>
       <div class="modal-header">
+        <button class="ios-text-btn ios-text-btn--cancel" id="trip-modal-close">Abbrechen</button>
         <h2 id="trip-modal-title">Neue Reise</h2>
-        <button class="modal-close" id="trip-modal-close">&times;</button>
+        <button class="ios-text-btn ios-text-btn--done" id="trip-save-btn">Sichern</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -202,7 +203,6 @@
         <button class="btn btn-danger hidden" id="trip-delete-btn">Reise löschen</button>
         <div class="modal-footer-right">
           <button class="btn btn-ghost" id="trip-cancel-btn">Abbrechen</button>
-          <button class="btn btn-primary" id="trip-save-btn">Speichern</button>
         </div>
       </div>
     </div>
@@ -211,9 +211,11 @@
   <!-- Expense Modal -->
   <div class="modal-overlay hidden" id="expense-modal-overlay">
     <div class="modal" id="expense-modal">
+      <div class="sheet-handle"></div>
       <div class="modal-header">
+        <button class="ios-text-btn ios-text-btn--cancel" id="expense-modal-close">Abbrechen</button>
         <h2 id="expense-modal-title">Neue Ausgabe</h2>
-        <button class="modal-close" id="expense-modal-close">&times;</button>
+        <button class="ios-text-btn ios-text-btn--done" id="exp-save-btn-header">Sichern</button>
       </div>
       <div class="modal-body">
         <div class="form-row">
@@ -289,9 +291,11 @@
   <!-- Member Modal -->
   <div class="modal-overlay hidden" id="member-modal-overlay">
     <div class="modal modal-sm" id="member-modal">
+      <div class="sheet-handle"></div>
       <div class="modal-header">
+        <button class="ios-text-btn ios-text-btn--cancel" id="member-modal-close">Abbrechen</button>
         <h2 id="member-modal-title">Familienmitglied</h2>
-        <button class="modal-close" id="member-modal-close">&times;</button>
+        <button class="ios-text-btn ios-text-btn--done" id="mem-save-btn">Sichern</button>
       </div>
       <div class="modal-body">
         <div class="form-group">
@@ -307,7 +311,6 @@
         <button class="btn btn-danger hidden" id="mem-delete-btn">Entfernen</button>
         <div class="modal-footer-right">
           <button class="btn btn-ghost" id="mem-cancel-btn">Abbrechen</button>
-          <button class="btn btn-primary" id="mem-save-btn">Speichern</button>
         </div>
       </div>
     </div>

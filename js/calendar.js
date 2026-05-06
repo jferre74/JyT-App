@@ -20,10 +20,8 @@ function renderCalendarPage() {
   const view = STATE.ui.calendarView;
   let html = '';
 
-  if (view === 'week')  html = renderWeekView();
-  else if (view === 'day')   html = renderDayViewHTML();
-  else if (view === 'year-summary') html = renderYearSummaryView();
-  else                       html = renderMonthView();
+  if (view === 'year-summary') html = renderYearSummaryView();
+  else                         html = renderMonthView();
 
   page.innerHTML = html;
   attachCalendarEvents();
@@ -84,8 +82,6 @@ function renderCalendarHeader() {
   const views = [
     {id:'year-summary', label:'Planer'},
     {id:'month', label:'Monat'},
-    {id:'week',  label:'Woche'},
-    {id:'day',   label:'Tag'},
   ];
   let switcher = `<div class="header-view-switcher">`;
   for (const v of views) {
@@ -94,9 +90,11 @@ function renderCalendarHeader() {
   switcher += `</div>`;
 
   const calDate = parseLocalDate(STATE.ui.calendarDate);
-  const monthLabel = `${MONTH_NAMES[calDate.getMonth()]} ${calDate.getFullYear()}`;
+  const monthLabel = STATE.ui.calendarView === 'year-summary'
+    ? ''
+    : `${MONTH_NAMES[calDate.getMonth()]} ${calDate.getFullYear()}`;
 
-  document.getElementById('header-title').textContent = monthLabel;
+  document.getElementById('header-title').textContent = '';
   // Calendar is a top-level page — no back button
   document.getElementById('header-back').innerHTML = '';
   const ha = document.getElementById('header-actions');
@@ -713,8 +711,6 @@ function navigateCalendar(dir) {
   const calDate = parseLocalDate(base);
   if (view === 'year-summary') calDate.setFullYear(calDate.getFullYear() + dir);
   else if (view === 'month') calDate.setMonth(calDate.getMonth() + dir);
-  else if (view === 'week')  calDate.setDate(calDate.getDate() + dir*7);
-  else if (view === 'day')   calDate.setDate(calDate.getDate() + dir);
   const newDateStr = localDateStr(calDate);
   STATE.ui.calendarDate = newDateStr;
   if (view === 'day') STATE.ui.selectedDay = newDateStr;
@@ -844,7 +840,6 @@ function deleteEvent() {
 
 function initCalendarModal() {
   document.getElementById('event-modal-close').addEventListener('click', closeEventModal);
-  document.getElementById('ev-cancel-btn').addEventListener('click', closeEventModal);
   document.getElementById('ev-save-btn').addEventListener('click', saveEvent);
   document.getElementById('ev-delete-btn').addEventListener('click', deleteEvent);
   document.getElementById('event-modal-overlay').addEventListener('click', (e) => {

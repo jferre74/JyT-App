@@ -780,11 +780,8 @@ function deleteExpense() {
 
 function initExpenseModal() {
   document.getElementById('expense-modal-close').addEventListener('click', closeExpenseModal);
-  document.getElementById('exp-cancel-btn').addEventListener('click', closeExpenseModal);
-  // iOS: "Sichern" button is now in the modal header
+  // iOS: "Sichern" button is in the modal header
   document.getElementById('exp-save-btn-header')?.addEventListener('click', saveExpense);
-  // Legacy footer save button (hidden in iOS layout, kept for safety)
-  document.getElementById('exp-save-btn')?.addEventListener('click', saveExpense);
   document.getElementById('exp-delete-btn').addEventListener('click', deleteExpense);
   document.getElementById('expense-modal-overlay').addEventListener('click', (e) => {
     if (e.target === document.getElementById('expense-modal-overlay')) closeExpenseModal();

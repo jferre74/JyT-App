@@ -145,6 +145,10 @@ function initApp() {
   const startPage = STATE.ui.currentPage || 'calendar';
   STATE.ui.calendarView = 'year-summary';
   STATE.ui.selectedDay = null; // Clear any selected day on boot to show the full year
+  // Always reset calendarDate to today (using local date, not UTC) so the planner
+  // never shows yesterday's date after 22:00 local time or on next-day boot.
+  const _n = new Date();
+  STATE.ui.calendarDate = `${_n.getFullYear()}-${String(_n.getMonth()+1).padStart(2,'0')}-${String(_n.getDate()).padStart(2,'0')}`;
 
   // Activate the correct nav item
   document.querySelectorAll('.nav-item').forEach(b => {

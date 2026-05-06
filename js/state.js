@@ -100,7 +100,7 @@ const DEFAULT_STATE = {
   ui: {
     currentPage: 'calendar',
     calendarView: 'year-summary',
-    calendarDate: new Date().toISOString().slice(0, 10),
+    calendarDate: (function(){ const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`; })(),
     selectedDay: null,
     selectedListId: null,
     selectedTripId: 't1',

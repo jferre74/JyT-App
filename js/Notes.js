@@ -37,7 +37,7 @@ function renderNotesList() {
   } else {
     let html = `<div class="notes-list">`;
     // Sort newest first
-    const sorted = [...notes].sort((a,b) => b.updated.localeCompare(a.updated));
+    const sorted = [...notes].sort((a, b) => new Date(b.updated) - new Date(a.updated));
     for (const note of sorted) {
       const preview = stripHTML(note.content).slice(0, 80) || 'Leere Notiz';
       const date = formatNoteDate(note.updated);
